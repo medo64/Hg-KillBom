@@ -1,0 +1,11 @@
+KillBom Mercurial Extension
+---------------------------
+
+This Mercurial extension will remove the BOM from all UTF-8 encoded files.
+Resulting file will still be UTF-8 but without the pesky BOM bytes.
+
+
+To use it just add following in the `hgrc` or global Mercurial settings file:
+
+    [extensions]
+    killbom = /path/to/killbom.py
