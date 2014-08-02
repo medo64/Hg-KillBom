@@ -58,19 +58,19 @@ def execute(ui, repo, ctx, opts, allowModify):
 
     files = ctx.files() if ctx else []
     for file in files:
-        ui.note("checking %s\n" % file)
+        ui.note("checking {0}\n".format(file))
         
         if not os.path.isfile(file):
-            ui.debug("skipping %s: not found\n" % file)
+            ui.debug("skipping {0}: not found\n".format(file))
             continue
         
         size = os.path.getsize(file)
         if size < 3:
-            ui.debug("skipping %s: too small\n" % file)
+            ui.debug("skipping {0}: too small\n".format(file))
             continue
         
         if size > 1048576:
-            ui.debug("skipping %s: too big\n" % file)
+            ui.debug("skipping {0}: too big\n".format(file))
             continue
 
         with open(file, 'rb') as f:
@@ -78,22 +78,22 @@ def execute(ui, repo, ctx, opts, allowModify):
             f.close()
         
         if not raw.startswith(codecs.BOM_UTF8):
-            ui.debug("skipping %s: no UTF-8 BOM\n" % file)
+            ui.debug("skipping {0}: no UTF-8 BOM\n".format(file))
             continue
         else:
             encoding = "utf-8-sig"
 
         if allowModify:
-            ui.debug("removing BOM in %s\n" % file)
+            ui.debug("removing BOM in {0}\n".format(file))
             with codecs.open(file, "rb", encoding=encoding) as f:
                 raw = f.read(size)
                 f.close()
             with codecs.open(file, "wb", encoding="utf-8") as f:
                 f.write(raw)
                 f.close()
-            ui.status("removed BOM in %s\n" % file)
+            ui.status("removed BOM in {0}\n".format(file))
         else:
-            ui.status("skipped BOM removal for %s\n" % file)
+            ui.status("skipped BOM removal for {0}\n".format(file))
             anyBomed = True
 
     return 1 if anyBomed else 0
