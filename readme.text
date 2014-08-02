@@ -1,11 +1,54 @@
 KillBom Mercurial Extension
----------------------------
+===========================
 
-This Mercurial extension will remove the BOM from all UTF-8 encoded files.
-Resulting file will still be UTF-8 but without the pesky BOM bytes.
+This Mercurial extension will remove the BOM from all Unicode files. Resulting
+file will be UTF-8 and without pesky BOM bytes.
 
+
+Overview
+--------
+
+This extension will modify all Unicode files with BOM (byte order mark) and
+convert them to BOM-less UTF-8. This comes especially handy when dealing with
+Microsoft's Visual Studio that is really UTF-8 BOM happy.
+
+Extensions adds two commands and two hooks.
+
+
+Configuration
+-------------
 
 To use it just add following in the `hgrc` or global Mercurial settings file:
 
     [extensions]
     killbom = /path/to/killbom.py
+    
+    [killbom]
+    extensions = utf-8 utf-16le utf-16be utf-32le utf-32be
+    maxsize = 1024
+
+
+Usage
+-----
+
+Using `killbom` command will remove Unicode COM from all modified and newly
+added files:
+
+    hg killbom [options]
+    
+    options:
+         -8 --utf8only  removes only UTF-8 BOM signature
+
+
+To just verify whether all files are BOM free, you would use `checkbom` command:
+
+    hg checkbom [options]
+    
+    options:
+         -8 --utf8only  checks for only UTF-8 BOM signature
+
+
+In addition there are three hooks. On `pretxncommit` and `pretxnchangegroup`
+extension will verify whether all Unicode files are BOM-free and it will stop
+commit if they are not. On `precommit` extension will modify files and remove
+BOM.
