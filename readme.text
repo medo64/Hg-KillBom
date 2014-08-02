@@ -12,8 +12,8 @@ This extension will modify all Unicode files with BOM (byte order mark) and
 convert them to BOM-less UTF-8. This comes especially handy when dealing with
 Microsoft's Visual Studio that is really UTF-8 BOM happy.
 
-Extensions adds two commands (`killbom`, `checkbom`) and hooks into the commit
-process.
+Extensions adds two commands (`killbom` and `checkbom`) and hooks into the
+commit process.
 
 
 Configuration
@@ -27,6 +27,14 @@ To use it just add following in the `hgrc` or global Mercurial settings file:
     [killbom]
     extensions = utf-8 utf-16le utf-16be utf-32le utf-32be
     maxsize = 1024
+    action = modify
+
+ * `extensions` is a list of all Unicode encodings that will be recognized.
+ * `maxsize` is maximum file size that will be processed (in kilobytes).
+ * `action` can be either `modify` (default), `verify`, or `ignore`. If value is
+   `modify` then files will be adjusted before the commit; if value is `verify`
+   then commit will be aborted if there are Unicode files with BOM but files
+   won't be modified; if value is `ignore` there won't be any action.
 
 
 Usage
