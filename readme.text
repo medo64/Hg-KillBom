@@ -25,16 +25,16 @@ To use it just add following in the `hgrc` or global Mercurial settings file:
     killbom = /path/to/killbom.py
     
     [killbom]
+    action = modify
     extensions = utf-8 utf-16le utf-16be utf-32le utf-32be
     maxsize = 1024
-    action = modify
 
- * `extensions` is a list of all Unicode encodings that will be recognized.
- * `maxsize` is maximum file size that will be processed (in kilobytes).
  * `action` can be either `modify` (default), `verify`, or `ignore`. If value is
    `modify` then files will be adjusted before the commit; if value is `verify`
    then commit will be aborted if there are Unicode files with BOM but files
    won't be modified; if value is `ignore` there won't be any action.
+ * `extensions` is a list of all Unicode encodings that will be recognized.
+ * `maxsize` is maximum file size that will be processed (in kilobytes).
 
 
 Usage
@@ -46,7 +46,7 @@ added files:
     hg killbom [options]
     
     options:
-       -8 --utf8only  removes only UTF-8 BOM signature
+      -8 --utf8only  removes only UTF-8 BOM signature
 
 
 To just verify whether all files are BOM free, you would use `checkbom` command:
@@ -54,7 +54,7 @@ To just verify whether all files are BOM free, you would use `checkbom` command:
     hg checkbom [options]
     
     options:
-       -8 --utf8only  checks for only UTF-8 BOM signature
+      -8 --utf8only  checks for only UTF-8 BOM signature
 
 
 In addition there are three hooks. On `pretxncommit` and `pretxnchangegroup`
