@@ -12,7 +12,8 @@ This extension will modify all Unicode files with BOM (byte order mark) and
 convert them to BOM-less UTF-8. This comes especially handy when dealing with
 Microsoft's Visual Studio that is really UTF-8 BOM happy.
 
-Extensions adds two commands and two hooks.
+Extensions adds two commands (`killbom`, `checkbom`) and hooks into the commit
+process.
 
 
 Configuration
@@ -37,7 +38,7 @@ added files:
     hg killbom [options]
     
     options:
-         -8 --utf8only  removes only UTF-8 BOM signature
+       -8 --utf8only  removes only UTF-8 BOM signature
 
 
 To just verify whether all files are BOM free, you would use `checkbom` command:
@@ -45,7 +46,7 @@ To just verify whether all files are BOM free, you would use `checkbom` command:
     hg checkbom [options]
     
     options:
-         -8 --utf8only  checks for only UTF-8 BOM signature
+       -8 --utf8only  checks for only UTF-8 BOM signature
 
 
 In addition there are three hooks. On `pretxncommit` and `pretxnchangegroup`
