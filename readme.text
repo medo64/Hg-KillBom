@@ -47,6 +47,7 @@ added files:
     
     options:
       -8 --utf8only  removes only UTF-8 BOM signature
+      -a --all       check all files in the repository
 
 
 To just verify whether all files are BOM free, you would use `checkbom` command:
@@ -55,6 +56,7 @@ To just verify whether all files are BOM free, you would use `checkbom` command:
     
     options:
       -8 --utf8only  checks for only UTF-8 BOM signature
+      -a --all       check all files in the repository
 
 
 In addition there are three hooks. On `pretxncommit` and `pretxnchangegroup`

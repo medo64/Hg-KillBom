@@ -15,23 +15,23 @@ from mercurial import util
 
 def killbom(ui, repo, **opts):
     """Removes Unicode BOM."""
-    kb = KillBom(ui, repo, repo[None], opts, ['modify'])
+    kb = KillBom(ui, repo, opts, ['modify'])
     return kb.process()
 
 def checkbom(ui, repo, **opts):
     """Checks for Unicode BOM."""
-    kb = KillBom(ui, repo, repo[None], opts, ['verify'])
+    kb = KillBom(ui, repo, opts, ['verify'])
     return kb.process()
 
 
 def modify(ui, repo, **kwargs):
     ui.debug("killbom: modify hook\n")
-    kb = KillBom(ui, repo, repo[None], None, ['modify', 'verify', 'ignore'])
+    kb = KillBom(ui, repo, None, ['modify', 'verify', 'ignore'])
     return kb.process()
 
 def verify(ui, repo, **kwargs):
     ui.debug("killbom: verify hook\n")
-    kb = KillBom(ui, repo, repo[None], None, ['verify', 'ignore'])
+    kb = KillBom(ui, repo, None, ['verify', 'ignore'])
     return kb.process()
 
 
@@ -43,13 +43,15 @@ def reposetup(ui, repo):
 cmdtable = {
     'killbom':  (
                  killbom,
-                 [('8', 'utf8only', False, "removes only UTF-8 BOM signature")],
+                 [('8', 'utf8only', False, "removes only UTF-8 BOM signature"),
+                  ('a', 'all', False, "check all files in the repository")],
                  'hg killbom [options]'
                 ),
 
     'checkbom': (
                  checkbom,
-                 [('8', 'utf8only', False, "checks for only UTF-8 BOM signature")],
+                 [('8', 'utf8only', False, "checks for only UTF-8 BOM signature"),
+                  ('a', 'all', False, "check all files in the repository")],
                  'hg checkbom [options]'
                 )
 }
@@ -70,22 +72,27 @@ class KillBom:
     BOM_UTF32_BE = ('utf-32_be', codecs.BOM_UTF32_BE, "utf-32be")
     BOM_ALL = [BOM_UTF8, BOM_UTF16_LE, BOM_UTF16_BE, BOM_UTF32_LE, BOM_UTF32_BE]
 
-    def __init__(self, ui, repo, ctx, opts, validActions):
+    def __init__(self, ui, repo, opts, validActions):
         self.ui = ui
-        self.ctx = ctx
 
         if (opts == None):
             ui.debug("killbom: reading settings from hgrc\n")
             action = ui.config('killbom', 'action', '');
             encodings = [encoding.lower() for encoding in ui.configlist('killbom', 'encodings', default=[])]
             maxsize = ui.config('killbom', 'maxsize', self.ui.config('tortoisehg', 'maxdiff', default='1024'));
+            modified, added, removed, deleted, unknown, ignored, clean = repo.status(clean=True)
+            files = modified + added
 
         else: #check from command line
             ui.debug("killbom: reading settings from command line\n")
             action = validActions[0];
             encodings = ['utf-8-sig'] if opts["utf8only"] else []
-            maxsize = opts["maxsize"] if "maxsize" in opts else ''
-
+            maxsize = opts["maxsize"] if "maxsize" in opts else ui.config('killbom', 'maxsize', self.ui.config('tortoisehg', 'maxdiff', default='1024'))
+            modified, added, removed, deleted, unknown, ignored, clean = repo.status(clean=True)
+            if opts["all"]:
+                files = modified + added + clean
+            else:
+                files = modified + added
 
         action = action.lower()
         self.action = validActions[0]
@@ -115,14 +122,15 @@ class KillBom:
                 ui.warn("unknown maximum size {1}: {0}!\n".format(e, maxsize))
             self.maxsize = 1024 * 1024
         ui.note("killbom: maxsize: {0} kb\n".format(self.maxsize / 1024))
+        
+        self.files = files
+        ui.note("killbom: files (count): {0}\n".format(len(self.files)))
 
-            
+
     def process(self):    
         anyBomed = False
-        files = self.ctx.files() if self.ctx else []
-        self.ui.debug("killbom: checking {0} file(s)\n".format(len(files)))
 
-        for file in files:
+        for file in self.files:
             self.ui.debug("killbom: checking {0}\n".format(file))
             
             if not os.path.isfile(file):
@@ -180,7 +188,7 @@ class KillBom:
                     self.ui.warn("error removing {1} BOM in {0}: {2}\n".format(file, detectedEncoding[2], e))
 
             else:
-                self.ui.note("killbom: skipped {1} BOM removal for {0}\n".format(file, detectedEncoding[2]))
+                self.ui.status("found {1} BOM in {0}\n".format(file, detectedEncoding[2]))
                 anyBomed = True
 
         if not anyBomed:
