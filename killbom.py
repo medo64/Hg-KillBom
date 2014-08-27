@@ -57,7 +57,7 @@ cmdtable = {
 }
 
 
-testedwith = '2.9.2 3.0.2'
+testedwith = '2.9.2 3.0.2 3.1 3.1+2'
 buglink = 'https://bitbucket.org/jmedved/hg-killbom/issues'
 
 
